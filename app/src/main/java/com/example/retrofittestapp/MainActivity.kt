@@ -4,6 +4,7 @@ package com.example.retrofittestapp
 import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
 import android.util.Log
+import androidx.recyclerview.widget.LinearLayoutManager
 import com.example.retrofittestapp.databinding.ActivityMainBinding
 import retrofit2.Call
 import retrofit2.Callback
@@ -14,19 +15,19 @@ import retrofit2.converter.gson.GsonConverterFactory
 class MainActivity : AppCompatActivity() {
 
     private lateinit var binding: ActivityMainBinding
-
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         binding = ActivityMainBinding.inflate(layoutInflater)
         setContentView(binding.root)
 
+        setUpFun()
+    }
+    fun setUpFun(){
         Client.api.getMemberList().enqueue(object : Callback<JsonDto>{
             override fun onResponse(call: Call<JsonDto>, response: Response<JsonDto>) {
                 if(response.isSuccessful) {
                     val data:JsonDto = response.body()!!
-                    for (item in data){
-                        println("log ${item.title}")
-                    }
+                    setRecyclerView(data)
                 } else {
                     println("no res~")
                 }
@@ -52,5 +53,10 @@ class MainActivity : AppCompatActivity() {
             }
 
         })
+    }
+    fun setRecyclerView(data:List<JsonDto.JsonDtoItem>){
+        val adapter = Adapter(data)
+        binding.recyclerView.layoutManager = LinearLayoutManager(this)
+        binding.recyclerView.adapter = adapter
     }
 }
